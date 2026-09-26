@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block title %}Patient Dashboard · MediCase AI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-head"><div><span class="eyebrow">PATIENT DASHBOARD</span><h1>Welcome, {{ patient['name'] }}</h1><p>Your information is stored under your own patient account.</p></div>
+  <a class="btn primary" href="{{ url_for('new_consultation') }}">＋ Start Consultation</a></div>
+  <div class="profile-strip"><div><b>Patient ID</b><strong>{{patient['patient_code']}}</strong></div><div><b>Age</b><strong>{{patient['age'] or '—'}}</strong></div><div><b>Gender</b><strong>{{patient['gender'] or '—'}}</strong></div><div><b>Language</b><strong>{{patient['preferred_language']}}</strong></div></div>
+  <div class="dashboard-grid">
+    <a class="dash-card accent" href="{{ url_for('new_consultation') }}"><span>🎙️</span><h3>Start New Consultation</h3><p>Talk or type your information.</p></a>
+    <a class="dash-card" href="{{ url_for('patient_history') }}"><span>🗂️</span><h3>Previous Consultations</h3><p>{{consultation_count}} consultation(s)</p></a>
+    <a class="dash-card" href="{{ url_for('patient_history') }}"><span>❤️</span><h3>Medical History</h3><p>View your saved cases.</p></a>
+    <a class="dash-card" href="{{ url_for('patient_profile') }}"><span>👤</span><h3>My Profile</h3><p>Edit your basic information.</p></a>
+  </div>
+  {% if latest %}<div class="mini-status"><b>Latest consultation:</b> {{ latest['status'] }} · {{ latest['created_at'][:10] }}</div>{% endif %}
+</div>
+{% endblock %}

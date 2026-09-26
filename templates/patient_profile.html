@@ -1,0 +1,14 @@
+
+{% extends "base.html" %}
+{% block title %}My Profile · MediCase AI{% endblock %}
+{% block content %}
+<div class="page narrow"><div class="page-head"><div><span class="eyebrow">MY PROFILE</span><h1>Personal information</h1></div></div>
+<form class="card form-card" method="post">
+  <div class="avatar">👤</div><label>Name<input name="name" value="{{patient['name']}}" required></label>
+  <label>Email<input name="email" type="email" value="{{patient['email']}}" required></label>
+  <div class="two"><label>Age<input name="age" type="number" value="{{patient['age'] or ''}}"></label><label>Gender<select name="gender"><option>{{patient['gender'] or 'Select'}}</option><option>Female</option><option>Male</option><option>Other</option></select></label></div>
+  <div class="two"><label>Phone<input name="phone" value="{{patient['phone'] or ''}}"></label><label>Preferred Language<select name="preferred_language">{% for x in languages %}<option {% if x==patient['preferred_language'] %}selected{% endif %}>{{x}}</option>{% endfor %}</select></label></div>
+  <div class="id-chip">Patient ID · <b>{{patient['patient_code']}}</b></div>
+  <button class="btn primary">Save Changes</button>
+</form></div>
+{% endblock %}

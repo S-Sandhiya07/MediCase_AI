@@ -1,0 +1,19 @@
+
+{% extends "base.html" %}
+{% block title %}Patient Case Summary · MediCase AI{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-head"><div><span class="eyebrow">CASE SHEET</span><h1>Patient Case Summary</h1><p>Review the information before your doctor reviews the case.</p></div><a class="btn secondary" href="{{url_for('patient_history')}}">Back to History</a></div>
+  <section class="patient-banner"><div class="avatar">👤</div><div><h2>{{case['name']}}</h2><p>{{case['patient_code']}} · {{case['age'] or 'Age —'}} · {{case['gender'] or 'Gender —'}} · {{case['preferred_language']}}</p></div><span class="status">{{case['status']}}</span></section>
+  <div class="summary-grid">
+  {% for field,label in [('chief_complaint','Chief Complaint'),('symptoms','Symptoms'),('duration','Duration'),('severity','Severity'),('symptom_details','Symptom Details'),('medical_history','Medical History'),('previous_surgeries','Previous Surgeries'),('medications','Current Medications'),('allergies','Allergies'),('family_history','Family History'),('lifestyle','Lifestyle Information')] %}
+    <div class="summary-item"><span>{{label}}</span><p>{{case[field] or 'Not provided'}}</p></div>
+  {% endfor %}
+  </div>
+  <section class="card conversation-view"><div class="panel-title"><h2>Original Conversation</h2></div>
+    {% for m in messages %}<div class="conversation-line"><b>{{m['speaker']}}</b><p>{{m['message']}}</p></div>{% endfor %}
+  </section>
+  <div class="actions"><a class="btn secondary" href="{{url_for('patient_history')}}">Back to History</a><a class="btn primary" href="{{url_for('patient_dashboard')}}">Dashboard</a></div>
+  <div class="disclaimer">AI-assisted documentation only. A qualified healthcare professional must review the information and make clinical decisions.</div>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+{% block title %}Medical History · MediCase AI{% endblock %}
+{% block content %}
+<div class="page"><div class="page-head"><div><span class="eyebrow">PATIENT HISTORY</span><h1>Your consultations</h1><p>Only consultations associated with your patient account are shown.</p></div><a class="btn primary" href="{{url_for('new_consultation')}}">＋ New Consultation</a></div>
+<div class="timeline">
+{% for r in rows %}
+<a class="timeline-item" href="{{url_for('case_summary',consultation_id=r['id'])}}">
+  <div class="dot"></div><div class="timeline-card"><div><b>{{r['created_at'][:10]}}</b><span class="status">{{r['status']}}</span></div><h3>{{r['chief_complaint'] or 'Consultation'}}</h3><p>Open complete case →</p></div>
+</a>
+{% else %}<div class="empty card"><h3>No consultations yet</h3><p>Start your first consultation to create your medical case record.</p></div>{% endfor %}
+</div></div>
+{% endblock %}

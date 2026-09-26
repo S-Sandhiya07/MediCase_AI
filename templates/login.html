@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+{% block title %}Patient Login · MediCase AI{% endblock %}
+{% block content %}
+<div class="auth-page"><form class="auth-card" method="post">
+  <span class="eyebrow">PATIENT PORTAL</span><h1>Welcome back</h1>
+  <label>Email<input name="email" type="email" required></label>
+  <label>Password<input name="password" type="password" required></label>
+  <button class="btn primary full">Login as Patient</button>
+  <p class="center">New patient? <a href="{{ url_for('register') }}">Create account</a></p>
+  <p class="center"><a href="{{ url_for('doctor_login') }}">Doctor Login →</a></p>
+</form></div>
+{% endblock %}

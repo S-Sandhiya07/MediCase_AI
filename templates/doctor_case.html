@@ -1,0 +1,22 @@
+
+{% extends "base.html" %}
+{% block title %}Doctor Case Review · MediCase AI{% endblock %}
+{% block content %}
+<div class="page"><div class="page-head"><div><span class="eyebrow">DOCTOR REVIEW</span><h1>{{case['name']}} · {{case['patient_code']}}</h1><p>Consultation {{case['created_at'][:10]}} · <span class="status">{{case['status']}}</span></p></div><a class="btn secondary" href="{{url_for('doctor_dashboard')}}">← Dashboard</a></div>
+<section class="patient-banner"><div class="avatar">👤</div><div><h2>Patient Information</h2><p>ID: {{case['patient_code']}} · Age: {{case['age'] or '—'}} · Gender: {{case['gender'] or '—'}} · Phone: {{case['phone'] or '—'}} · Language: {{case['preferred_language']}}</p></div></section>
+<div class="summary-grid">
+{% for field,label in [('chief_complaint','Chief Complaint'),('symptoms','Symptoms'),('duration','Duration'),('severity','Severity'),('medications','Medications'),('allergies','Allergies'),('medical_history','Medical History'),('previous_surgeries','Previous Surgeries'),('family_history','Family History'),('lifestyle','Lifestyle')] %}
+<div class="summary-item"><span>{{label}}</span><p>{{case[field] or 'Not provided'}}</p></div>
+{% endfor %}
+</div>
+<section class="card conversation-view"><div class="panel-title"><h2>AI Conversation</h2></div>
+{% for m in messages %}<div class="conversation-line"><b>{{m['speaker']}}</b><p>{{m['message']}}</p></div>{% endfor %}
+</section>
+<section class="card form-card"><span class="eyebrow">CLINICIAN INPUT</span><h2>Doctor Notes</h2>
+<form method="post"><textarea name="notes" rows="8" placeholder="Enter professional review notes…">{{note['notes'] if note else ''}}</textarea>
+<div class="actions"><button class="btn secondary" name="action" value="save">Save Changes</button><button class="btn secondary" name="action" value="review">Mark Reviewed</button><button class="btn primary" name="action" value="finalize">Finalize Case</button></div></form>
+{% if case['status']=='Finalized' %}<div class="finalized">✓ Finalized by Doctor</div>{% endif %}
+</section>
+<div class="disclaimer">The AI collects and organizes information. The qualified healthcare professional makes the final clinical decision.</div>
+</div>
+{% endblock %}

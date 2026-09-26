@@ -1,0 +1,11 @@
+
+{% extends "base.html" %}
+{% block title %}Doctor Dashboard · MediCase AI{% endblock %}
+{% block content %}
+<div class="page"><div class="page-head"><div><span class="eyebrow">CLINICIAN PORTAL</span><h1>Doctor Dashboard</h1><p>Review patient information collected by MediCase AI.</p></div></div>
+<div class="stats-grid"><div class="stat"><span>👥</span><b>{{stats.patients}}</b><small>Total Patients</small></div><div class="stat"><span>📅</span><b>{{stats.today}}</b><small>Today's Consultations</small></div><div class="stat"><span>⏳</span><b>{{stats.pending}}</b><small>Pending Reviews</small></div><div class="stat"><span>✓</span><b>{{stats.completed}}</b><small>Completed Cases</small></div></div>
+<section class="card table-card"><div class="panel-title"><div><span class="eyebrow">RECENT CASES</span><h2>Recent Patient Cases</h2></div></div>
+<div class="table-wrap"><table><thead><tr><th>Patient ID</th><th>Patient Name</th><th>Age</th><th>Chief Complaint</th><th>Date</th><th>Status</th><th>Action</th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{r['patient_code']}}</b></td><td>{{r['name']}}</td><td>{{r['age'] or '—'}}</td><td>{{r['chief_complaint'] or 'Not provided'}}</td><td>{{r['created_at'][:10]}}</td><td><span class="badge">{{r['status']}}</span></td><td><a class="table-link" href="{{url_for('doctor_case',consultation_id=r['id'])}}">View Case</a></td></tr>{% else %}<tr><td colspan="7">No cases yet.</td></tr>{% endfor %}
+</tbody></table></div></section></div>
+{% endblock %}

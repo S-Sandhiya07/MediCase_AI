@@ -1,0 +1,20 @@
+
+{% extends "base.html" %}
+{% block title %}Create Patient Account · MediCase AI{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <form class="auth-card" method="post">
+    <span class="eyebrow">PATIENT REGISTRATION</span><h1>Create your account</h1>
+    <p>Every patient receives a separate Patient ID and private consultation history.</p>
+    <label>Full Name<input name="name" required placeholder="Enter your name"></label>
+    <div class="two"><label>Age<input name="age" type="number" min="0" max="120" placeholder="Age"></label>
+    <label>Gender<select name="gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select></label></div>
+    <div class="two"><label>Phone<input name="phone" placeholder="Phone number"></label>
+    <label>Preferred Language<select name="preferred_language">{% for x in languages %}<option>{{x}}</option>{% endfor %}</select></label></div>
+    <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+    <label>Password<input name="password" type="password" required minlength="6" placeholder="Create password"></label>
+    <button class="btn primary full">Create Account</button>
+    <p class="center">Already registered? <a href="{{ url_for('login') }}">Login</a></p>
+  </form>
+</div>
+{% endblock %}

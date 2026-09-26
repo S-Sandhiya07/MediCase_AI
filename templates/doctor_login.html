@@ -1,0 +1,13 @@
+
+{% extends "base.html" %}
+{% block title %}Doctor Login · MediCase AI{% endblock %}
+{% block content %}
+<div class="auth-page"><form class="auth-card doctor-auth" method="post">
+  <span class="eyebrow">CLINICIAN PORTAL</span><h1>Doctor Login</h1>
+  <p>Review patient information and finalize cases.</p>
+  <label>Doctor Email<input name="email" type="email" required placeholder="doctor@example.com"></label>
+  <label>Password<input name="password" type="password" required></label>
+  <button class="btn primary full">Login as Doctor</button>
+  <div class="demo-box"><b>SIH demo account</b><br>doctor@medicase.ai<br>Doctor@123</div>
+</form></div>
+{% endblock %}

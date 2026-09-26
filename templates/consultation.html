@@ -1,0 +1,89 @@
+
+{% extends "base.html" %}
+{% block title %}Consultation · MediCase AI{% endblock %}
+{% block content %}
+<div class="page consultation-page">
+  <div class="page-head compact"><div><span class="eyebrow">CONSULTATION</span><h1>AI Case-Taking Assistant</h1><p>Patient: {{patient['name']}} · {{patient['patient_code']}}</p></div><span class="status">{{case['status']}}</span></div>
+  <div class="consult-grid">
+    <section class="chat card">
+      <div class="chat-head"><div class="ai-avatar">✦</div><div><b>AI Case-Taking Assistant</b><small>Information collection only · not diagnosis</small></div></div>
+      <div id="chatMessages" class="chat-messages">
+        {% for m in messages %}<div class="bubble-row {{'patient-row' if m['speaker']=='Patient' else ''}}"><div class="bubble {{'patient-bubble' if m['speaker']=='Patient' else 'ai-bubble'}}"><small>{{m['speaker']}}</small>{{m['message']}}</div></div>{% endfor %}
+      </div>
+      <div class="transcript" id="transcriptBox" hidden><b>Voice transcription</b><p id="transcript"></p><div><button type="button" class="btn small" onclick="useTranscript()">Use text</button><button type="button" class="btn small ghost" onclick="cancelTranscript()">Cancel</button></div></div>
+      <div class="composer"><select id="language"><option>English</option>{% for x in languages %}{% if x!='English' %}<option>{{x}}</option>{% endif %}{% endfor %}</select><input id="messageInput" placeholder="Type your response…"><button id="micBtn" class="icon-btn" type="button" title="Voice">🎙️</button><button id="sendBtn" class="btn primary">Send</button></div>
+      <div id="listenStatus" class="listen-status"></div>
+    </section>
+
+    <aside class="case-panel card">
+      <div class="panel-title"><div><span class="eyebrow">LIVE</span><h2>Case Information</h2></div><span>↻</span></div>
+      {% for field,label in [('chief_complaint','Chief Complaint'),('duration','Duration'),('severity','Severity'),('symptoms','Associated Symptoms'),('medications','Current Medications'),('allergies','Allergies'),('medical_history','Medical History')] %}
+      <div class="info-card"><span>{{label}}</span><strong id="case-{{field}}">{{case[field] or 'Not provided'}}</strong></div>
+      {% endfor %}
+    </aside>
+  </div>
+
+  <section class="card manual-card">
+    <div class="panel-title"><div><span class="eyebrow">OPTIONAL</span><h2>Manual Case Information</h2></div><button class="btn small ghost" onclick="clearManual()">Clear</button></div>
+    <div class="manual-grid">
+      <label>Chief Complaint<textarea data-field="chief_complaint">{{case['chief_complaint']}}</textarea></label>
+      <label>Symptoms<textarea data-field="symptoms">{{case['symptoms']}}</textarea></label>
+      <label>Duration<textarea data-field="duration">{{case['duration']}}</textarea></label>
+      <label>Severity<textarea data-field="severity">{{case['severity']}}</textarea></label>
+      <label>Symptom Details<textarea data-field="symptom_details">{{case['symptom_details']}}</textarea></label>
+      <label>Medical History<textarea data-field="medical_history">{{case['medical_history']}}</textarea></label>
+      <label>Previous Surgeries<textarea data-field="previous_surgeries">{{case['previous_surgeries']}}</textarea></label>
+      <label>Current Medications<textarea data-field="medications">{{case['medications']}}</textarea></label>
+      <label>Allergies<textarea data-field="allergies">{{case['allergies']}}</textarea></label>
+      <label>Family History<textarea data-field="family_history">{{case['family_history']}}</textarea></label>
+      <label>Lifestyle Information<textarea data-field="lifestyle">{{case['lifestyle']}}</textarea></label>
+    </div>
+    <div class="actions"><button class="btn secondary" onclick="saveManual()">Save Fields</button><button class="btn primary" onclick="saveConsultation()">Generate & Save Case Summary</button></div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const consultationId={{case['id']}};
+const messageInput=document.getElementById('messageInput');
+const chatMessages=document.getElementById('chatMessages');
+function addBubble(speaker,text){
+ const row=document.createElement('div'); row.className='bubble-row '+(speaker==='Patient'?'patient-row':'');
+ row.innerHTML='<div class="bubble '+(speaker==='Patient'?'patient-bubble':'ai-bubble')+'"><small>'+speaker+'</small>'+escapeHtml(text)+'</div>';
+ chatMessages.appendChild(row); chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+document.getElementById('sendBtn').onclick=sendMessage;
+messageInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendMessage();}});
+async function sendMessage(){
+ const text=messageInput.value.trim(); if(!text)return;
+ addBubble('Patient',text); messageInput.value='';
+ const r=await fetch('/api/consultation/'+consultationId+'/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+ const data=await r.json(); if(!r.ok){alert(data.error||'Could not send');return;}
+ addBubble('AI',data.reply); updateCase(data.case);
+}
+function updateCase(c){['chief_complaint','duration','severity','symptoms','medications','allergies','medical_history'].forEach(f=>{let e=document.getElementById('case-'+f);if(e)e.textContent=c[f]||'Not provided';});}
+async function saveManual(){
+ const data={}; document.querySelectorAll('[data-field]').forEach(e=>data[e.dataset.field]=e.value);
+ const r=await fetch('/api/consultation/'+consultationId+'/manual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+ if(r.ok){location.reload()}else{alert('Could not save fields.')}
+}
+function saveConsultation(){
+ const f=document.createElement('form');f.method='POST';f.action='/consultation/'+consultationId+'/save';document.body.appendChild(f);f.submit();
+}
+function clearManual(){document.querySelectorAll('[data-field]').forEach(e=>e.value='');}
+let recognition=null;
+const mic=document.getElementById('micBtn'), status=document.getElementById('listenStatus');
+if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ recognition=new SR(); recognition.interimResults=true; recognition.continuous=false;
+ recognition.onstart=()=>{status.textContent='🎙️ Listening…';mic.classList.add('recording');};
+ recognition.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById('transcript').textContent=t;document.getElementById('transcriptBox').hidden=false;};
+ recognition.onerror=()=>{status.textContent='Voice recognition could not start. You can type instead.';mic.classList.remove('recording');};
+ recognition.onend=()=>{mic.classList.remove('recording');if(status.textContent.includes('Listening'))status.textContent='';};
+ mic.onclick=()=>{recognition.lang=({'English':'en-IN','Tamil':'ta-IN','Hindi':'hi-IN','Telugu':'te-IN','Kannada':'kn-IN','Malayalam':'ml-IN'})[document.getElementById('language').value]||'en-IN';recognition.start();};
+}else{mic.disabled=true;status.textContent='Voice input is not supported in this browser.';}
+function useTranscript(){messageInput.value=document.getElementById('transcript').textContent;cancelTranscript();messageInput.focus();}
+function cancelTranscript(){document.getElementById('transcriptBox').hidden=true;document.getElementById('transcript').textContent='';}
+</script>
+{% endblock %}

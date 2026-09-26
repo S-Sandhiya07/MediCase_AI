@@ -1,0 +1,55 @@
+
+{% extends "base.html" %}
+{% block title %}MediCase AI · Patient Case-Taking Assistant{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <span class="eyebrow">SMART INDIA HACKATHON · HEALTHCARE AI</span>
+    <h1>AI-Powered Patient <span>Case-Taking Assistant</span></h1>
+    <p>Collect. Structure. Review. Better healthcare conversations.</p>
+    <div class="hero-actions">
+      {% if current_user %}
+      <a class="btn primary" href="{{ url_for('patient_dashboard') if current_user['role']=='patient' else url_for('doctor_dashboard') }}">Open Dashboard</a>
+      {% else %}
+      <a class="btn primary" href="{{ url_for('register') }}">Start Consultation</a>
+      <a class="btn secondary" href="{{ url_for('doctor_login') }}">Doctor Login</a>
+      {% endif %}
+    </div>
+    <div class="notice">AI-assisted information collection. Final clinical decisions are made by qualified healthcare professionals.</div>
+  </div>
+  <div class="hero-visual">
+    <div class="flow-card">
+      <div class="flow-node">👤<b>Patient</b></div><div class="arrow">→</div>
+      <div class="flow-node">🎙️<b>AI Conversation</b></div><div class="arrow">→</div>
+      <div class="flow-node">📋<b>Case Sheet</b></div><div class="arrow">→</div>
+      <div class="flow-node">👨‍⚕️<b>Doctor</b></div>
+    </div>
+    <div class="floating-card"><span>●</span> Secure patient-specific records</div>
+  </div>
+</section>
+
+<section id="features" class="section">
+  <div class="section-head"><span class="eyebrow">FEATURES</span><h2>Designed around the real clinical workflow</h2></div>
+  <div class="feature-grid">
+    <article class="feature"><span>🎙️</span><h3>Voice-Based Case Taking</h3><p>Patients can speak instead of typing.</p></article>
+    <article class="feature"><span>🤖</span><h3>Intelligent AI Conversation</h3><p>Structured follow-up questions collect key information.</p></article>
+    <article class="feature"><span>🌐</span><h3>Multilingual Support</h3><p>English, Tamil, Hindi, Telugu, Kannada and Malayalam interface options.</p></article>
+    <article class="feature"><span>📋</span><h3>Automatic Case Sheet</h3><p>Conversation data is organized into structured fields.</p></article>
+    <article class="feature"><span>💾</span><h3>Complete Patient History</h3><p>Each consultation is linked to the correct patient account.</p></article>
+    <article class="feature"><span>👨‍⚕️</span><h3>Doctor Review</h3><p>Doctors review, edit and finalize collected information.</p></article>
+  </div>
+</section>
+
+<section id="how" class="section soft">
+  <div class="section-head"><span class="eyebrow">HOW IT WORKS</span><h2>From conversation to doctor review</h2></div>
+  <div class="workflow">
+    {% for n,t in [(1,'Patient Registration'),(2,'Voice / Text Conversation'),(3,'AI Case-Taking'),(4,'Information Extraction'),(5,'Structured Case Sheet'),(6,'Doctor Review'),(7,'Final Clinical Decision')] %}
+      <div class="step"><span>0{{n}}</span><b>{{t}}</b></div>
+    {% endfor %}
+  </div>
+</section>
+<section class="disclaimer">
+  <h3>AI is an assistant, not a doctor.</h3>
+  <p>This system assists with patient information collection and documentation. It does not provide autonomous diagnosis or replace professional medical judgment.</p>
+</section>
+{% endblock %}
